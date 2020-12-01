@@ -64,8 +64,10 @@ def main(controller_config=_default_controller_config, logger=_default_logger, r
 
     if logger:
         print('logger')
-        c.logger = larpix.logger.HDF5Logger()
+        c.logger = larpix.logger.HDF5Logger(filename=kwargs['filename'])
+        #c.logger = larpix.logger.HDF5Logger()
         print('filename:',c.logger.filename)
+        c.logger.record_configs(list(c.chips.values()))
         c.logger.enable()
 
     if controller_config is None:
@@ -125,11 +127,13 @@ def main(controller_config=_default_controller_config, logger=_default_logger, r
         registers += list(register_map['enable_miso_differential'])
 
         c.write_configuration(chip_key, registers)
+        c.write_configuration(chip_key, registers)
 
     # verify
     c.io.double_send_packets = True
     for chip_key in c.chips:
-        ok,diff = c.verify_registers([(chip_key,0)],timeout=0.01)
+
+        ok,diff = c.enforce_registers([(chip_key,0)],timeout=0.01, n=10, n_verify=10)
         if not ok:
             for key in diff:
                 print('config error',key,diff[key])

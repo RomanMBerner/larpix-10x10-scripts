@@ -14,6 +14,7 @@ import larpix
 import larpix.io
 
 import base
+from datetime import datetime
 
 _default_controller_config=None
 _default_periodic_trigger_cycles=100000
@@ -34,12 +35,18 @@ def main(controller_config=_default_controller_config, periodic_trigger_cycles=_
     chip_keys = [chip_key]
     if chip_key is None:
         chip_keys = list(c.chips.keys())
-    if disabled_channels is None:
-        disabled_channels = list()
 
     # set configuration
     c.io.double_send_packets = True
+
     for chip_key, chip in [(chip_key, chip) for (chip_key, chip) in c.chips.items() if chip_key in chip_keys]:
+        # Disable channels
+        #print(' disabling channels: ')
+        for disabled_key in disabled_channels:
+            if disabled_key == chip_key or disabled_key == 'All':
+                for disabled_channel in disabled_channels[disabled_key]:
+                    chip.config.csa_enable[disabled_channel] = 0
+                    #print('     ', disabled_channel)
         #print(' --- chip_key:', chip_key, ' --- ')
         chip.config.periodic_trigger_mask = [1]*64
         chip.config.channel_mask = [1]*64
@@ -83,7 +90,7 @@ def main(controller_config=_default_controller_config, periodic_trigger_cycles=_
         c.write_configuration(chip_key, 'csa_enable')
 
     for chip_key in c.chips:
-        ok, diff = c.verify_configuration(chip_key, timeout=0.01)
+        ok, diff = c.enforce_configuration(chip_key, timeout=0.01, n=10, n_verify=10)
         if not ok:
             print('config error',diff)
     c.io.double_send_packets = True
