@@ -21,8 +21,9 @@ _default_config_name=None
 _default_controller_config=None
 _default_runtime=30*60 # 30-min run files
 _default_n_adc_burst = 2
+_default_disabled_channels = None
 
-def main(config_name=_default_config_name, controller_config=_default_controller_config, runtime=_default_runtime, n_adc_burst=_default_n_adc_burst):
+def main(config_name=_default_config_name, controller_config=_default_controller_config, runtime=_default_runtime, n_adc_burst=_default_n_adc_burst, disabled_channels=_default_disabled_channels):
     print('START RUN')
     # create controller
     c = None
@@ -30,9 +31,9 @@ def main(config_name=_default_config_name, controller_config=_default_controller
         c = base.main(controller_config)
     else:
         if controller_config is None:
-            c = load_config.main(config_name, logger=True)
+            c = load_config.main(config_name, logger=True, disabled_channels=disabled_channels)
         else:
-            c = load_config.main(config_name, controller_config, logger=True)
+            c = load_config.main(config_name, controller_config, logger=True, disabled_channels=disabled_channels)
 
     chips_to_test = c.chips.keys()
     for chip_key in chips_to_test:
@@ -76,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--config_name', default=_default_config_name, type=str, help='''Directory or filename to load chip configurations from''')
     parser.add_argument('--controller_config', default=_default_controller_config, type=str, help='''Hydra network configuration file''')
     parser.add_argument('--runtime', default=_default_runtime, type=float, help='''Time duration before flushing remaining data to disk and initiating a new run (in seconds) (default=%(default)s)''')
-    parser.add_argument('--n_adc_burst', default=_default_n_adc_burst, type=float, help='''No. Conversions per channel hit''')
+    parser.add_argument('--n_adc_burst', default=_default_n_adc_burst, type=int, help='''No. Conversions per channel hit''')
+    parser.add_argument('--disabled_channels', default=_default_disabled_channels, type=json.loads, help='''json-formatted dict of <chip key>:[<channels>] you'd like disabled''')
     args = parser.parse_args()
     c = main(**vars(args))

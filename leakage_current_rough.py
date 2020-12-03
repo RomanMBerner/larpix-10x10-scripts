@@ -42,7 +42,8 @@ def main(controller_config=_default_controller_config, chip_key=_default_chip_ke
         c.write_configuration(chip_key, registers)
         c.write_configuration(chip_key, registers)
 
-        ok, diff = c.verify_configuration(chip_key, timeout=0.01)
+        #ok, diff = c.verify_configuration(chip_key, timeout=0.01)
+        ok, diff = c.enforce_configuration(chip_key, timeout=0.01, n=10, n_verify=10)
         if not ok:
             print('config error',diff)
         c.io.double_send_packets = False

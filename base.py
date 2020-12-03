@@ -64,7 +64,7 @@ def main(controller_config=_default_controller_config, logger=_default_logger, r
 
     if logger:
         print('logger')
-        c.logger = larpix.logger.HDF5Logger(filename=kwargs['filename'])
+        c.logger = larpix.logger.HDF5Logger(filename=kwargs.get('filename',None))
         #c.logger = larpix.logger.HDF5Logger()
         print('filename:',c.logger.filename)
         c.logger.record_configs(list(c.chips.values()))

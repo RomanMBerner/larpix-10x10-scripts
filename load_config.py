@@ -68,11 +68,15 @@ def main(config_name=_default_config_name, controller_config=_default_controller
     # verify
     print('verifying')
     print('SKIPPING VERIFY!!!')
-    #for chip_key in c.chips:
-    #    ok, diff = c.verify_configuration(chip_key, timeout=0.1)
-    #    if not ok:
-    #        print('config error',diff)
-    #        print('packets',len(c.reads[-1].extract('packet_type',packet_type=0)))
+    '''
+    for chip_key in c.chips:
+        ok, diff = c.enforce_configuration(chip_key, timeout=0.1, n=10, n_verify=10)
+        if not ok:
+            print('config error',diff)
+            print('packets',len(c.reads[-1].extract('packet_type',packet_type=0)))
+        else:
+            print(chip_key,'ok')
+    '''
     c.io.double_send_packets = False
 
     if hasattr(c,'logger') and c.logger:

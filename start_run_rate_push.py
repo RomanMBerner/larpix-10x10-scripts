@@ -17,6 +17,8 @@ import json
 from collections import defaultdict
 import time
 
+import subprocess
+
 _default_config_name=None
 _default_controller_config=None
 _default_runtime=30*60 # 30-min run files
@@ -95,10 +97,12 @@ def main(config_name=_default_config_name, controller_config=_default_controller
                 c.reads = []
                 now = time.time()
                 if now > start_time + runtime: break
-                if now > last_time + 1:
+                if now > last_time + 2:
                     #print('average rate: {:0.2f}Hz\r'.format(counter/(time.time()-start_time)),end='')
                     #print('                                                                   \r')
                     print('average rate [delta_t = {:0.2f} s]: {:0.2f}Hz\r'.format(now-last_time,counter/(now-last_time)),end='')
+                    post = 'datarate,sens=larpix1 value={:0.2f}'.format(counter/(now-last_time))
+                    subprocess.call(["curl","--silent","-XPOST", "http://130.92.139.3:8086/write?db=singlemodule_nov2020", "--data-binary", post])
                     counter = 0
                     last_time = now
             except:
